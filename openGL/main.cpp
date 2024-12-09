@@ -9,6 +9,7 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 
 #define WIDTH 800
@@ -134,14 +135,13 @@ int main() {
 		1, 2, 3
 	};
 
-	unsigned int vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	VertexArray va;
 
 	VertexBuffer vb(positions, 4 * 3 * sizeof(float));
+	VertexBufferLayout layout;
+	layout.Push<float>(3);
 
-	GlCall(glEnableVertexAttribArray(0));
-	GlCall(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0));
+	va.AddBuffer(vb, layout);
 
 	IndexBuffer ib(indices, 2 * 3 * sizeof(unsigned int));
 
@@ -154,8 +154,8 @@ int main() {
 	ASSERT(location != -1);
 	glUniform4f(location, 0.2f, 0.3f, 0.0f, 1.0f);
 
-	glBindVertexArray(0);
 	glUseProgram(0);
+	va.UnBind();
 	vb.UnBind();
 	ib.UnBind();
 
@@ -164,9 +164,9 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shader);
-		glBindVertexArray(vao);
+		va.Bind();
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-		glBindVertexArray(vao);
+		va.UnBind();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
