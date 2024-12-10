@@ -10,6 +10,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Texture.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -40,27 +41,29 @@ int main() {
 	}
 
 	/* Data */
-	float positions[12] = 
+	float positions[20] = 
 	{
-		 -0.5f,  0.5f, 0.0f, // left upper corner
-		 -0.5f, -0.5f, 0.0f, // left lower corner
-		  0.5f,  0.5f, 0.0f, // right upper corner
-		  0.5f, -0.5f, 0.0f  // right lower corner
+		 -0.5f,  0.5f, 0.0f, 0.0f, 0.0f, // left upper corner
+		 -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // left lower corner
+		  0.5f,  0.5f, 0.0f, 1.0f, 1.0f, // right upper corner
+		  0.5f, -0.5f, 0.0f, 0.0f, 1.0f  // right lower corner
 	};
 
 	unsigned int indices[6] = {
 		0, 1, 2,
 		1, 2, 3
 	};
-
+	GlCall(glEnable(GL_BLEND));
+	GlCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
 	/* Initializing object's */
 	VertexArray va;
 
-	VertexBuffer vb(positions, 4 * 3 * sizeof(float));
+	VertexBuffer vb(positions, 4 * 5 * sizeof(float));
 	VertexBufferLayout layout;
 
 	layout.Push<float>(3);
+	layout.Push<float>(2);
 	va.AddBuffer(vb, layout);
 
 	IndexBuffer ib(indices, 2 * 3 * sizeof(unsigned int));
@@ -69,10 +72,13 @@ int main() {
 	shader.Bind();
 
 	/* UnBinding all element's */
-	shader.UnBind();
 	va.UnBind();
 	vb.UnBind();
 	ib.UnBind();
+
+	Texture texture("../res/textures/tree.png");
+	texture.Bind();
+	shader.SetUniform1i("u_Texture", 0);
 
 	Renderer renderer;
 
@@ -82,7 +88,6 @@ int main() {
 
 		/* Render */
 		shader.Bind();
-		shader.SetUniform4f("u_Color", 0.2f, 0.3f, 0.0f, 1.0);
 
 		renderer.Draw(va, ib, shader);
 

@@ -54,21 +54,31 @@ ShaderProgramSource Shader::ParseShader()
 	return { ss[0].str(), ss[1].str() };
 }
 
+void Shader::SetUniform1i(const std::string& name, int v0)
+{
+	GlCall(glUniform1i(GetUniformLocation(name), v0));
+}
+
+void Shader::SetUniform1f(const std::string& name, float v0)
+{
+	GlCall(glUniform1f(GetUniformLocation(name), v0));
+}
+
 void Shader::SetUniform4f(const std::string& name, float v0, float v1, float v2, float v3)
 {
 	GlCall(glUniform4f(GetUniformLocation(name), v0, v1, v2, v3));
 }
 
-unsigned int Shader::GetUniformLocation(const std::string& name)
+int Shader::GetUniformLocation(const std::string& name)
 {
 	if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
 		return m_UniformLocationCache[name];
 
-	GlCall(unsigned int location = glGetUniformLocation(m_RendererID, name.c_str()));
+	GlCall(int location = glGetUniformLocation(m_RendererID, name.c_str()));
 	if (location == -1)
 		std::cout << "Warning: uniform " << name << " doesn't exist!" << std::endl;
-	else
-		m_UniformLocationCache[name] = location;
+	
+	m_UniformLocationCache[name] = location;
 
 	return location;
 }
