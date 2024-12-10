@@ -6,6 +6,7 @@ void GlClearError()
 {
 	while (glGetError() != GL_NO_ERROR);
 }
+
 bool GlLogCall(const char* function, const char* file, int line)
 {
 	while (GLenum error = glGetError())
@@ -15,4 +16,12 @@ bool GlLogCall(const char* function, const char* file, int line)
 		return false;
 	}
 	return true;
+}
+
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+{
+	shader.Bind();
+	va.Bind();
+	ib.Bind();
+	GlCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
 }

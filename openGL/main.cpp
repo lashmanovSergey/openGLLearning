@@ -1,15 +1,15 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <iostream>
+
 #include "Renderer.h"
 
 #include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
-
-#include <iostream>
-
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -68,12 +68,13 @@ int main() {
 	Shader shader("default.shader");
 	shader.Bind();
 
-
 	/* UnBinding all element's */
 	shader.UnBind();
 	va.UnBind();
 	vb.UnBind();
 	ib.UnBind();
+
+	Renderer renderer;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -83,14 +84,10 @@ int main() {
 		shader.Bind();
 		shader.SetUniform4f("u_Color", 0.2f, 0.3f, 0.0f, 1.0);
 
-		va.Bind();
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-		va.UnBind();
-
-		shader.UnBind();
+		renderer.Draw(va, ib, shader);
 
 		glfwSwapBuffers(window);
-
 		glfwPollEvents();
 	}
+	return 0;
 }
